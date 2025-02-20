@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encrypt/Decrypt Chat</title>
+  <title>Messenger</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,38 +12,39 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #f9f9f9;
+      background-color: #f0f2f5;
     }
-    .chat-container {
-      width: 400px;
-      height: 600px;
-      background: #fff;
+    .messenger {
+      width: 90%;
+      max-width: 400px;
+      height: 90%;
+      max-height: 600px;
+      background: white;
       border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
     .chat-window {
       flex: 1;
       overflow-y: auto;
-      padding: 15px;
-      border-bottom: 1px solid #ccc;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
     }
-    .message {
-      margin: 10px 0;
-      padding: 10px 15px;
-      border-radius: 15px;
-      max-width: 75%;
-      word-wrap: break-word;
+    .chat-window .message {
+      margin: 5px 0;
+      padding: 8px 12px;
+      border-radius: 20px;
+      max-width: 70%;
     }
-    .message.user {
-      background: #4CAF50;
+    .chat-window .message.user {
+      background: #007bff;
       color: white;
       align-self: flex-end;
     }
-    .message.bot {
-      background: #f1f1f1;
-      color: #333;
+    .chat-window .message.bot {
+      background: #e4e6eb;
+      color: black;
       align-self: flex-start;
     }
     .input-area {
@@ -53,27 +54,34 @@
     .input-area input {
       flex: 1;
       padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       border-radius: 20px;
       outline: none;
+      font-size: 14px;
     }
     .input-area button {
       margin-left: 10px;
       padding: 10px 20px;
-      background-color: #4CAF50;
+      background: #007bff;
       color: white;
       border: none;
       border-radius: 20px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background 0.3s;
+      font-size: 14px;
     }
     .input-area button:hover {
-      background-color: #45a049;
+      background: #0056b3;
+    }
+    @media (max-height: 500px) {
+      .messenger {
+        height: 95%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
+  <div class="messenger">
     <div class="chat-window" id="chatWindow"></div>
     <div class="input-area">
       <input type="text" id="messageInput" placeholder="Type your message...">
@@ -114,37 +122,37 @@
       return decryptedText;
     }
 
-    // Display message in chat window
-    function displayMessage(text, sender) {
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message', sender);
-      messageElement.textContent = text;
-      chatWindow.appendChild(messageElement);
-
-      // Scroll to bottom
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
-
-    // Handle send button click
     sendButton.addEventListener('click', () => {
       const userMessage = messageInput.value.trim();
+
       if (userMessage) {
-        const operation = prompt("Do you want to (e)ncrypt or (d)ecrypt?").trim().toLowerCase();
-        const shift = parseInt(prompt("Enter the shift value:"), 10);
-
-        if (operation === 'e') {
-          const encryptedMessage = encrypt(userMessage, shift);
-          displayMessage(encryptedMessage, 'user');
-        } else if (operation === 'd') {
-          const decryptedMessage = decrypt(userMessage, shift);
-          displayMessage(decryptedMessage, 'user');
-        } else {
-          alert("Invalid operation. Please choose 'e' to encrypt or 'd' to decrypt.");
-        }
-
+        addMessage(userMessage, 'user');
         messageInput.value = '';
+
+        setTimeout(() => {
+          const operation = prompt("Do you want to (e)ncrypt or (d)ecrypt?").trim().toLowerCase();
+          const shift = parseInt(prompt("Enter the shift value:"), 10);
+
+          if (operation === 'e') {
+            const encrypted = encrypt(userMessage, shift);
+            addMessage(`Encrypted: ${encrypted}`, 'bot');
+          } else if (operation === 'd') {
+            const decrypted = decrypt(userMessage, shift);
+            addMessage(`Decrypted: ${decrypted}`, 'bot');
+          } else {
+            addMessage("Invalid operation. Please choose 'e' or 'd'.", 'bot');
+          }
+        }, 1000);
       }
     });
+
+    function addMessage(text, sender) {
+      const message = document.createElement('div');
+      message.classList.add('message', sender);
+      message.textContent = text;
+      chatWindow.appendChild(message);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
   </script>
 </body>
 </html>
